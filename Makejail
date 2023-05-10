@@ -1,0 +1,44 @@
+INCLUDE gh+AppJail-makejails/ubuntu
+
+VAR hiraclient_version=2.1.1
+
+CMD echo "======> Creating user 'hiraclient' <======"
+CMD useradd -Um -s /bin/bash hiraclient
+
+CMD echo "======> Installing dependencies (jail) <======"
+PKG xserver-xorg libxcomposite1 libnss3 libatk1.0-0 libgdk-pixbuf2.0-0 libgtk-3-0 pulseaudio
+# This is only for downloading HiraClient.
+PKG wget
+
+CMD echo "======> Installing dependencies (host) <======"
+PKG --local pulseaudio
+
+CMD echo "======> Installing HiraClient <======"
+
+CMD mkdir -p /opt/hiraclient
+
+CMD echo "======> Downloading <======"
+CMD wget -O /opt/hiraclient/Hirana-Client-${hiraclient_version}.AppImage https://github.com/hirananet/HiraClient/releases/download/v${hiraclient_version}/Hirana-Client-${hiraclient_version}.AppImage
+CMD echo "======> Setting execution bit permission <======"
+CMD chmod +x /opt/hiraclient/Hirana-Client-${hiraclient_version}.AppImage
+
+CMD echo "======> Extracting <======"
+CMD (cd /opt/hiraclient; ./Hirana-Client-${hiraclient_version}.AppImage --appimage-extract)
+
+CMD echo "======> Changing owner and group <======"
+CMD chown -R hiraclient:hiraclient /opt/hiraclient
+
+CMD echo "======> Done <======"
+
+STAGE create
+
+CMD --local xhost +
+
+STAGE custom:hiraclient_open
+
+ARG display=:0
+
+ENV DISPLAY=${display}
+USER hiraclient
+WORKDIR /opt/hiraclient/squashfs-root
+RUN ./hira-client-desktop --no-sandbox
