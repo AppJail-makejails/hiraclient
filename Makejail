@@ -30,6 +30,8 @@ CMD chown -R hiraclient:hiraclient /opt/hiraclient
 
 CMD echo "======> Done <======"
 
+STOP
+
 STAGE create
 
 CMD --local xhost +

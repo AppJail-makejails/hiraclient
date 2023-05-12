@@ -43,10 +43,11 @@ exec.stop: /bin/true
 persist
 ```
 
-Open a shell and run `appjail makejail`:
+Open a shell and run `appjail makejail` and `appjail start`:
 
 ```sh
 appjail makejail -j hiraclient -- --network development --ruleset 11
+appjail start hiraclient
 ```
 
 Your ruleset must unhide `shm` and `shm/*`.
